@@ -16,6 +16,7 @@ import org.lwjgl.util.vector.Vector4f;
 
 import entities.Camera;
 import entities.Entity;
+import entities.EntityTree;
 import entities.Light;
 import entities.Player;
 import fontMeshCreator.FontType;
@@ -23,6 +24,7 @@ import fontMeshCreator.GUIText;
 import fontRendering.TextMaster;
 import guis.GuiRenderer;
 import guis.GuiTexture;
+import javafx.scene.paint.Color;
 import models.RawModel;
 import models.TexturedModel;
 import normalMappingObjConverter.NormalMappedObjLoader;
@@ -52,8 +54,8 @@ public class Game
 {	
 	public static float time = 0;
 	public static boolean gameover = false;
-	public static int wood = 0;
-	public static int money = 0;
+	public static float wood = 0;
+	public static float money = 0;
 	
 	public static void run()
 	{
@@ -70,11 +72,6 @@ public class Game
 		TerrainTexture blendMap = new TerrainTexture(loader.loadTexture("blendMap"));
 		
 		//ENTITIES
-		
-		//TREE
-		ModelData treeData = OBJFileLoader.loadOBJ("tree");
-		RawModel treeRawModel = loader.loadToVAO(treeData.getVertices(), treeData.getTextureCoords(), treeData.getNormals(), treeData.getIndices());
-        TexturedModel treeModel = new TexturedModel(treeRawModel, new ModelTexture(loader.loadTexture("tree")));
         
         //CHERRY TREE
         TexturedModel cherrytreeModel = new TexturedModel(OBJLoader.loadObjModel("cherry", loader), new ModelTexture(loader.loadTexture("cherry")));
@@ -87,6 +84,10 @@ public class Game
         ModelData lpTreeData = OBJFileLoader.loadOBJ("lowPolyTree");
 		RawModel lpTreeRawModel = loader.loadToVAO(lpTreeData.getVertices(), lpTreeData.getTextureCoords(), lpTreeData.getNormals(), lpTreeData.getIndices());
         TexturedModel lpTreeModel = new TexturedModel(lpTreeRawModel, new ModelTexture(loader.loadTexture("lowPolyTree")));
+        
+        ModelData treeData = OBJFileLoader.loadOBJ("tree");
+		RawModel treeRawModel = loader.loadToVAO(treeData.getVertices(), treeData.getTextureCoords(), treeData.getNormals(), treeData.getIndices());
+        TexturedModel treeModel = new TexturedModel(treeRawModel, new ModelTexture(loader.loadTexture("tree")));
         
         //GRASS
 //        ModelData grassData = OBJFileLoader.loadOBJ("grassModel");
@@ -192,7 +193,7 @@ public class Game
         		float z = random.nextFloat() * 1240;
         		float y = terrain.getHeightOfTerrain(x, z);
         		if(y >= 0)
-        		entities.add(new Entity(treeModel, new Vector3f(x, y, z), 0, random.nextFloat(), 0, 4));
+        		entities.add(new EntityTree(treeModel, new Vector3f(x, y, z), 0, random.nextFloat(), 0, 4));
         	}
         }
         //CHERRY TREE LIST
@@ -252,8 +253,11 @@ public class Game
 		text.setOutlineColour(new Vector3f(1f, 0.1f, 0.2f));
 		
 		//RESOURCES
-		GUIText woodText = new GUIText("Wood: " + wood, 1.5f, font, new Vector2f(0.9f, 0), 1, false);
+		GUIText woodText = new GUIText("Wood: " + (int) wood, 1.5f, font, new Vector2f(0.9f, 0), 1, false);
 		woodText.setColour(0.3f, 0.4f, 0.7f);
+		
+		GUIText moneyText = new GUIText("Money: " + (int) money, 1.5f, font, new Vector2f(0.9f, 0.2f), 1, false);
+		moneyText.setColour((float) Color.GOLD.getRed(), (float) Color.GOLD.getGreen(), (float) Color.GOLD.getBlue());
 		
 		//PLAYER INFO
 		GUIText healthText = new GUIText("Health: " + player.health, 1.5f, font, new Vector2f(0.1f, 0.9f), 1, false);
@@ -340,7 +344,14 @@ public class Game
 				player.move(terrain);
 				camera.move();
 				picker.update();
-				Mouse.setGrabbed(true);
+				if(!Keyboard.isKeyDown(Keyboard.KEY_LSHIFT))
+				{
+					Mouse.setGrabbed(true);
+				}
+				else
+				{
+					Mouse.setGrabbed(false);
+				}
 
 				if(player.onFire)
 				{
@@ -355,25 +366,6 @@ public class Game
 				{
 					player.onFire = false;
 				}
-				
-				Vector3f terrainPoint = picker.getCurrentTerrainPoint();
-//				for(int i = 0; i < entities.size(); i++)
-//				{
-//					for(Entity entity : entities)
-//					{
-//						entity = entities.get(i);
-//						//if(entity = new Entity)
-//						if(entity.getPosition() == new Vector3f(terrainPoint.getX(), terrainPoint.getY(), terrainPoint.getZ()))
-//						{
-							if(Mouse.isButtonDown(1))
-							{
-								wood = wood + 1;
-								woodText.setTextString("Wood: " + wood);
-								woodText.update();
-							}
-//						}
-//					}	
-//				}
 							
 				breathText.setTextString("Breath: " + (int) player.breath);
 				healthText.setTextString("Health: " + (int) player.health);
@@ -442,6 +434,33 @@ public class Game
 				guiRenderer.render(deadGuis);
 			}
 			TextMaster.render();
+			
+			Vector3f terrainPoint = picker.getCurrentTerrainPoint();
+			for(int i = 0; i < entities.size(); i++)
+			{
+				for(Entity entity : entities)
+				{
+					entity = entities.get(i);
+					if(entity instanceof EntityTree)
+					{
+						if(terrainPoint != null)
+						{
+							if(entity.getPosition().getX() <= terrainPoint.getX() + 0.01f || entity.getPosition().getY() <= terrainPoint.getY() + 0.01f || entity.getPosition().getZ() <= terrainPoint.getZ() + 0.0007f && entity.getPosition().getX() >= terrainPoint.getX() - 0.001f || entity.getPosition().getY() >= terrainPoint.getY() - 0.000f || entity.getPosition().getZ() >= terrainPoint.getZ() - 0.0007f)
+							{
+								if(Mouse.isButtonDown(0))
+								{
+									if(wood < 50)
+									{
+										wood = wood + 0.1f;
+									}
+									woodText.setTextString("Wood: " + (int) wood);
+									woodText.update();
+								}
+							}	
+						}					
+					}
+				}	
+			}
 			
 			DisplayManager.updateDisplay();		
 		}

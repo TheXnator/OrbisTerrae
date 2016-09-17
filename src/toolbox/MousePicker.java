@@ -13,7 +13,7 @@ import entities.Camera;
 public class MousePicker
 {
 	private static final int RECURSION_COUNT = 200;
-	private static final float RAY_RANGE = 600;
+	private static final float RAY_RANGE = 100;
 
 	private Vector3f currentRay = new Vector3f();
 
@@ -38,7 +38,7 @@ public class MousePicker
 	}
 
 	public Vector3f getCurrentRay()
-{
+	{
 		return currentRay;
 	}
 

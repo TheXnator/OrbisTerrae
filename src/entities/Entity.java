@@ -1,12 +1,13 @@
 package entities;
 
 import models.TexturedModel;
+import renderEngine.Loader;
 
 import org.lwjgl.util.vector.Vector3f;
 
 public class Entity 
 {
-
+	protected Loader loader;
 	private TexturedModel model;
 	private Vector3f position;
 	private float rotX, rotY, rotZ;

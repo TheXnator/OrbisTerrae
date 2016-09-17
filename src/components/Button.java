@@ -117,7 +117,7 @@ public class Button
      */
     public boolean mousePressed(float mouseX, float mouseY)
     {
-        return this.enabled && this.visible && mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height && Mouse.isButtonDown(0);
+        return this.enabled && this.visible && this.hovered && Mouse.isButtonDown(0);
     }
 
     /**

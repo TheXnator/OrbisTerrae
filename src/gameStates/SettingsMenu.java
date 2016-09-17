@@ -53,14 +53,15 @@ public class SettingsMenu
 		};
 		
 		FontType arialMenuFont = new FontType(loader.loadFontTexture("segoeui"), "segoeui");
-		GUIText settingsText = new GUIText("Settings", 4, arialMenuFont, new Vector2f(0.4f, 0.05f), 1, false);
+		GUIText settingsText = new GUIText("Settings (WIP)", 4, arialMenuFont, new Vector2f(0.4f, 0.05f), 1, false);
 		settingsText.setColour(0.3f, 0.2f, 0.4f);
 		
 		List<GuiTexture> settingsGUIs = new ArrayList<GuiTexture>();
 		settingsGUIs.add(new GuiTexture(loader.loadTexture("settingsBackground"), new Vector2f(0, -0.87f), new Vector2f(2f, 2f)));
 		
 		Button fullscreen = new Button(0, 0.05f, 0.41f, 0.25f, 0.075f, "Fullscreen");
-		Slider sensitivitySlider = new Slider(guiRenderer, guiResponder, 0, 0.05f, 0.7f, "sensitivity", 0, 2, 1);
+		Slider sensitivitySlider = new Slider(guiRenderer, guiResponder, 1, 0.05f, 0.1f, "sensitivity", 0, 2, 1);
+		Button back = new Button(2, 0.05f, -0.3f, 0.25f, 0.075f, "Back");
 		
 		while(!Display.isCloseRequested())
 		{
@@ -79,6 +80,15 @@ public class SettingsMenu
 				sensitivitySlider.mouseDragged((2.0f * Mouse.getX()) / Display.getWidth() - 1f, (2.0f * Mouse.getY()) / Display.getHeight() - 1f, loader);
 			}
 			
+			back.drawButton((2.0f * Mouse.getX()) / Display.getWidth() - 1f, (2.0f * Mouse.getY()) / Display.getHeight() - 1f, loader, guiRenderer, 0.46f, 0.6f, 2);
+			if(back.mousePressed((2.0f * Mouse.getX()) / Display.getWidth() - 1f, (2.0f * Mouse.getY()) / Display.getHeight() - 1f))
+			{
+				back.buttonText.delete();
+				fullscreen.buttonText.delete();
+				settingsText.delete();
+				MainMenu.run();
+			}
+			
 			if(Keyboard.isKeyDown(Keyboard.KEY_F11))
 			{
 				Settings.setFullscreen();
@@ -92,6 +102,9 @@ public class SettingsMenu
 			{
 				e.printStackTrace();
 			}
+			
+			back.buttonText.delete();
+			fullscreen.buttonText.delete();
 			
 			DisplayManager.updateDisplay();		
 		}

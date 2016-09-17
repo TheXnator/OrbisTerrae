@@ -141,25 +141,32 @@ public class Player extends Entity
 			}
 		}
 		
-		if(breath > 0)
+		//- and = breath
+		if(getPosition().y <= -6)
 		{
-			if(getPosition().y <= -6)
-			{
-				breath = breath - 0.1f;
-			}
-			else
-			{
-				if(breath < 50)
-				{
-					breath = 50;
-				}
-			}
+			breath = breath - 0.1f;
 		}
 		else
 		{
-			health = health - 0.05f;
+			if(breath < 50)
+			{
+				breath = 50;
+			}
 		}
-		
+		if(breath <= 0)
+		{
+			health = health - 0.1f;
+		}
+		if(breath < 0)
+		{
+			breath = 0;
+		}
+				
+		//Regen and death
+		if(health < 50 && breath > 0)
+		{
+			health = health + 0.1f;
+		}
 		if(health <= 0)
 		{
 			Game.gameover = true;
